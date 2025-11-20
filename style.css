@@ -1,0 +1,61 @@
+body{
+    margin: 0;
+    background-color: blueviolet;
+}
+
+.converter-container{
+    background-color: whitesmoke;
+    width: 40%;
+    height: 90vh;
+    margin: 2%;
+    padding-top: 2.5vh;
+    font-size: 22px;
+}
+
+.amount-input{
+    width: 90%;
+    height: 8vh;
+    font-size: 20px;
+}
+
+.selects-container{
+    display: flex;
+    justify-content: space-around;
+    margin-top: 4vh;
+}
+
+.select-currency{
+    background-color: blueviolet;
+    color: white;
+    width: 31%;
+    height: 8vh;
+    font-size: 16px;
+}
+
+.convert-button{
+    width: 90%;
+    margin-top: 4vh;
+    background-color: blueviolet;
+    color: white;
+    height: 10vh;
+    font-size: large;
+    border: none;
+}
+
+.result-container{
+    margin-top: 6vh;
+    background-color: #d09eff;
+    width: 90%;
+    height: 10vh;
+    align-content: center;
+}
+
+.swap-image{
+    width: 50px;
+}
+
+.swap-button{
+    border: none;
+    background-color: none;
+}
+
