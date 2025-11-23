@@ -99,3 +99,8 @@ body{
     width: 40%;
 }
 
+.author-text{
+    margin: 5%;
+    margin-top: 10vh;
+    font-size: 15px;
+}
