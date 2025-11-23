@@ -31,6 +31,20 @@ async function fillCurrencySelects(){
             currencySelects[i].appendChild(option)
         }
     }    
+
+    currencySelects[0].value = "USD"
+    currencySelects[1].value = "BRL"
+}
+
+function preventSameSelection(selectOne, selectTwo){
+    if(selectOne.value === selectTwo.value){
+        for(const option of selectTwo.options){
+            if (option.value !== selectOne.value) {
+                selectTwo.value = option.value;
+                break;
+             }
+        }
+    }
 }
 
 async function convertCurrency(currencyFrom, currencyTo, amount){
@@ -73,5 +87,13 @@ swapButton.addEventListener("click", () => {
     currencySelects[0].value = currencySelects[1].value
     currencySelects[1].value = tempValue
 })
+
+currencySelects[0].addEventListener("change", () => {
+    preventSameSelection(currencySelects[0], currencySelects[1]);
+});
+
+currencySelects[1].addEventListener("change", () => {
+    preventSameSelection(currencySelects[1], currencySelects[0]);
+});
 
 fillCurrencySelects()

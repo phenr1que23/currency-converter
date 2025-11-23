@@ -12,15 +12,24 @@
         <center>
             <h1>CURRENCY CONVERTER</h1>
             <input class="amount-input" type="number" id="amountInput" placeholder="Enter amount">
+            <div class="select-text">
+                <div class="text-from">
+                    <p>FROM</p>
+                </div>
+                <div class="text-to">
+                    <p>TO</p>
+                </div>
+                </div>
             <div class="selects-container">
                 <select class="select-currency" name="currencyFrom" id="currencyFrom"></select>
-                <button class="swap-button"id="swapButton"><img src="img/swap-svgrepo-com.svg" alt="" class="swap-image"></button>
+                <button class="swap-button"id="swapButton"><img src="img/swap.svg" alt="" class="swap-image"></button>
                 <select class="select-currency" name="currencyTo" id="currencyTo"></select>
             </div>
-            <button class="convert-button" id="convertButton">CONVERT</button>
+            <button class="convert-button" id="convertButton">EXCHANGE NOW</button>
             <div class="result-container" id="divResult">
             </div>
         </center>
     </div>
+    <img src="img/currency-exchange.svg" alt="" class="img-exchange">
 </body>
 </html>
