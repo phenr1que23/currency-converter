@@ -4,23 +4,35 @@ const convertButton = document.getElementById("convertButton")
 const swapButton = document.getElementById("swapButton")
 const amountInput = document.getElementById("amountInput")
 const currencySelects = [document.getElementById("currencyFrom"), document.getElementById("currencyTo")]
-const divResult = document.getElementById("divResult")
+const resultText = document.getElementById("result-text")
+const loading = document.getElementById("loading")
 
+hideLoading()
 async function fetchCurrencies() {
     try {
         const response = await fetch(`${API_BASE}/currencies`);
         if (!response.ok) {
             throw new Error(`Erro na requisição: ${response.status} ${response.statusText}`);
         }
-        return await response.json();
+        const currencies = await response.json();
+        localStorage.setItem('apiDataCache', JSON.stringify(currencies))
+
     } catch (error) {
         console.error(error);
         alert("Não foi possível carregar as moedas.");
     }
 }
 
+function getCurrencies(){
+    const currenciesJSONString = localStorage.getItem('apiDataCache');
+    if(currenciesJSONString){
+        const currencies = JSON.parse(currenciesJSONString)
+        return currencies;
+    }
+} 
+
 async function fillCurrencySelects(){
-    const currencies = await fetchCurrencies();
+    const currencies = getCurrencies();
     if(!currencies) return
     
     for (let i = 0; i < currencySelects.length; i++){
@@ -47,13 +59,27 @@ function preventSameSelection(selectOne, selectTwo){
     }
 }
 
+function showLoading(){
+    loading.style.display = "block"
+    resultText.style.display = "none"
+}
+
+function hideLoading(){
+    loading.style.display = "none"
+    resultText.style.display = "block"
+}
+
 async function convertCurrency(currencyFrom, currencyTo, amount){
-    if (amount <= 0 || amount === "") {
-        alert("Insira um valor válido.");
+    const numericAmount = Number(amount);
+
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+        alert("Insira um valor numérico válido.");
         return;
     }
 
+    showLoading()
     try{
+
     const response = await fetch(`${API_BASE}/latest?base=${currencyFrom}&symbols=${currencyTo}`);
 
     if(!response.ok) throw new Error("Erro ao converter a moeda.")
@@ -61,11 +87,14 @@ async function convertCurrency(currencyFrom, currencyTo, amount){
     const result = await response.json();
     const exchangeResult = (amount * result.rates[currencyTo]).toFixed(2);
 
-    divResult.textContent = `${amount} ${currencyFrom} = ${exchangeResult} ${currencyTo}`;
+    resultText.textContent = `${amount} ${currencyFrom} = ${exchangeResult} ${currencyTo}`;
 
     }catch (error) {
         console.error(error);
         alert("Ocorreu um erro na conversão.");
+    }
+    finally{
+        hideLoading();
     }
 }
 
@@ -86,6 +115,7 @@ swapButton.addEventListener("click", () => {
     const tempValue = currencySelects[0].value
     currencySelects[0].value = currencySelects[1].value
     currencySelects[1].value = tempValue
+    convertButton.click();
 })
 
 currencySelects[0].addEventListener("change", () => {
@@ -96,4 +126,9 @@ currencySelects[1].addEventListener("change", () => {
     preventSameSelection(currencySelects[1], currencySelects[0]);
 });
 
-fillCurrencySelects()
+async function init() {
+    await fetchCurrencies();
+    await fillCurrencySelects();
+}
+
+init();
