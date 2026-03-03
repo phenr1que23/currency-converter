@@ -6,6 +6,8 @@ const amountInput = document.getElementById("amountInput")
 const currencySelects = [document.getElementById("currencyFrom"), document.getElementById("currencyTo")]
 const resultText = document.getElementById("result-text")
 const loading = document.getElementById("loading")
+const CACHE_KEY = "currenciesCache";
+const CACHE_DURATION = 1000 * 60 * 60 * 24;
 
 hideLoading()
 async function fetchCurrencies() {
@@ -15,7 +17,8 @@ async function fetchCurrencies() {
             throw new Error(`Erro na requisição: ${response.status} ${response.statusText}`);
         }
         const currencies = await response.json();
-        localStorage.setItem('apiDataCache', JSON.stringify(currencies))
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheObject));
+        return currencies;
 
     } catch (error) {
         console.error(error);
@@ -24,28 +27,36 @@ async function fetchCurrencies() {
 }
 
 function getCurrencies(){
-    const currenciesJSONString = localStorage.getItem('apiDataCache');
-    if(currenciesJSONString){
-        const currencies = JSON.parse(currenciesJSONString)
-        return currencies;
+    const cache = localStorage.getItem(CACHE_KEY);
+    if (!cache) return null;
+
+    const parsedCache = JSON.parse(cache);
+    const now = Date.now();
+
+    if (now - parsedCache.timestamp > CACHE_DURATION) {
+        localStorage.removeItem(CACHE_KEY);
+        return null;
     }
+
+    return parsedCache.data;
+
 } 
 
-async function fillCurrencySelects(){
-    const currencies = getCurrencies();
-    if(!currencies) return
-    
-    for (let i = 0; i < currencySelects.length; i++){
-        for(const code in currencies){
-            const option = document.createElement("option")
-            option.value = code
-            option.textContent = `${code} - ${currencies[code]}`
-            currencySelects[i].appendChild(option)
-        }
-    }    
+async function fillCurrencySelects(currencies){
+    if (!currencies) return;
 
-    currencySelects[0].value = "USD"
-    currencySelects[1].value = "BRL"
+    for (let i = 0; i < currencySelects.length; i++) {
+        currencySelects[i].innerHTML = "";
+        for (const code in currencies) {
+            const option = document.createElement("option");
+            option.value = code;
+            option.textContent = `${code} - ${currencies[code]}`;
+            currencySelects[i].appendChild(option);
+        }
+    }
+
+    currencySelects[0].value = "USD";
+    currencySelects[1].value = "BRL";
 }
 
 function preventSameSelection(selectOne, selectTwo){
@@ -127,8 +138,13 @@ currencySelects[1].addEventListener("change", () => {
 });
 
 async function init() {
-    await fetchCurrencies();
-    await fillCurrencySelects();
+    let currencies = getCurrencies();
+
+    if (!currencies) {
+        currencies = await fetchCurrencies();
+    }
+
+    fillCurrencySelects(currencies);
 }
 
 init();
