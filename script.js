@@ -17,6 +17,10 @@ async function fetchCurrencies() {
             throw new Error(`Erro na requisição: ${response.status} ${response.statusText}`);
         }
         const currencies = await response.json();
+        const cacheObject = {
+            data: currencies,
+            timestamp: Date.now()
+        };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheObject));
         return currencies;
 
@@ -144,7 +148,9 @@ async function init() {
         currencies = await fetchCurrencies();
     }
 
-    fillCurrencySelects(currencies);
+    if (currencies) {
+        fillCurrencySelects(currencies);
+    }
 }
 
 init();
